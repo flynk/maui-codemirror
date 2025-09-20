@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Layouts;
 
-namespace MauiCodemirror
+namespace Flynk.Apps.Maui.Codemirror
 {
     /// <summary>
     /// Helper to create loading overlay for WebView-based editors

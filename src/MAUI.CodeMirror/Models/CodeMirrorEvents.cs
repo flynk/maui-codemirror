@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace MauiCodemirror.Models
+namespace Flynk.Apps.Maui.Codemirror.Models
 {
     /// <summary>
     /// Event arguments for CodeMirror events

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using MauiCodemirror.Models;
+using Flynk.Apps.Maui.Codemirror.Models;
 
-namespace MauiCodemirror.Services
+namespace Flynk.Apps.Maui.Codemirror.Services
 {
     /// <summary>
     /// Service for managing CodeMirror 6 themes

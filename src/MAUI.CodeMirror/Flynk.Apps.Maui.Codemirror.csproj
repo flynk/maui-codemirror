@@ -8,10 +8,10 @@
     <Nullable>disable</Nullable>
 
     <!-- Package Information -->
-    <PackageId>MAUI.CodeMirror</PackageId>
+    <PackageId>Flynk.Apps.Maui.Codemirror</PackageId>
     <Authors>Your Organization</Authors>
     <Company>Your Organization</Company>
-    <Product>MAUI CodeMirror</Product>
+    <Product>Flynk Apps MAUI CodeMirror</Product>
     <Description>A comprehensive .NET MAUI wrapper for the CodeMirror 6 editor with full API support</Description>
     <PackageProjectUrl>https://github.com/your-org/maui-codemirror</PackageProjectUrl>
     <RepositoryUrl>https://github.com/your-org/maui-codemirror</RepositoryUrl>

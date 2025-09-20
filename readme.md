@@ -83,7 +83,7 @@ dotnet build
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:cm="clr-namespace:MauiCodemirror;assembly=MAUI.CodeMirror"
+    xmlns:cm="clr-namespace:Flynk.Apps.Maui.CodeMirror;assembly=MAUI.CodeMirror"
     x:Class="YourApp.EditorPage">
 
     <cm:CodeMirrorEditor x:Name="Editor"
@@ -93,8 +93,8 @@ dotnet build
 ```
 
 ```csharp
-using MauiCodemirror;
-using MauiCodemirror.Models;
+using Flynk.Apps.Maui.CodeMirror;
+using Flynk.Apps.Maui.CodeMirror.Models;
 
 public partial class EditorPage : ContentPage
 {
@@ -226,7 +226,7 @@ hello();
 ### Custom Autocomplete
 
 ```csharp
-using MauiCodemirror.Services;
+using Flynk.Apps.Maui.CodeMirror.Services;
 
 var completionService = new CodeMirrorCompletionService();
 

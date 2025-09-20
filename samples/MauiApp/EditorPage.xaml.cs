@@ -1,6 +1,6 @@
-using MauiCodemirror;
-using MauiCodemirror.Models;
-using MauiCodemirror.Services;
+using Flynk.Apps.Maui.CodeMirror;
+using Flynk.Apps.Maui.CodeMirror.Models;
+using Flynk.Apps.Maui.CodeMirror.Services;
 
 namespace CodeMirrorSample;
 

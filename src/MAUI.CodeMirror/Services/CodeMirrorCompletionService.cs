@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MauiCodemirror.Models;
+using Flynk.Apps.Maui.Codemirror.Models;
 
-namespace MauiCodemirror.Services
+namespace Flynk.Apps.Maui.Codemirror.Services
 {
     /// <summary>
     /// Service for managing CodeMirror 6 autocomplete and IntelliSense features

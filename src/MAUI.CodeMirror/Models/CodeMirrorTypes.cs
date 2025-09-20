@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace MauiCodemirror.Models
+namespace Flynk.Apps.Maui.Codemirror.Models
 {
     /// <summary>
     /// Core type definitions for CodeMirror 6

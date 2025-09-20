@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 
-namespace MauiCodemirror
+namespace Flynk.Apps.Maui.Codemirror
 {
     public static class CodeEditorHelper
     {

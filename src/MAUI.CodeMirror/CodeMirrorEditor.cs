@@ -5,9 +5,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
-using MauiCodemirror.Models;
+using Flynk.Apps.Maui.Codemirror.Models;
 
-namespace MauiCodemirror
+namespace Flynk.Apps.Maui.Codemirror
 {
     /// <summary>
     /// Comprehensive CodeMirror 6 editor wrapper with full API support
