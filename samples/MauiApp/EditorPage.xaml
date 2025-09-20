@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:cm="clr-namespace:MauiCodemirror;assembly=MAUI.CodeMirror"
+             x:Class="CodeMirrorSample.EditorPage"
+             Title="CodeMirror Editor Sample">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="10">
+        
+        <!-- Toolbar -->
+        <HorizontalStackLayout Grid.Row="0" Spacing="10" Margin="0,0,0,10">
+            <Label Text="Language:" VerticalOptions="Center" />
+            <Picker x:Name="LanguagePicker" 
+                    SelectedIndexChanged="OnLanguageChanged"
+                    WidthRequest="150">
+                <Picker.Items>
+                    <x:String>javascript</x:String>
+                    <x:String>typescript</x:String>
+                    <x:String>python</x:String>
+                    <x:String>csharp</x:String>
+                    <x:String>html</x:String>
+                    <x:String>css</x:String>
+                    <x:String>json</x:String>
+                    <x:String>xml</x:String>
+                    <x:String>sql</x:String>
+                    <x:String>markdown</x:String>
+                </Picker.Items>
+            </Picker>
+
+            <Label Text="Theme:" VerticalOptions="Center" />
+            <Picker x:Name="ThemePicker" 
+                    SelectedIndexChanged="OnThemeChanged"
+                    WidthRequest="150">
+                <Picker.Items>
+                    <x:String>oneDark</x:String>
+                    <x:String>dracula</x:String>
+                    <x:String>githubLight</x:String>
+                    <x:String>githubDark</x:String>
+                    <x:String>monokai</x:String>
+                    <x:String>vsCode</x:String>
+                </Picker.Items>
+            </Picker>
+
+            <CheckBox x:Name="LineNumbersCheck" 
+                      IsChecked="True"
+                      CheckedChanged="OnLineNumbersChanged" />
+            <Label Text="Line Numbers" VerticalOptions="Center" />
+
+            <CheckBox x:Name="ReadOnlyCheck" 
+                      CheckedChanged="OnReadOnlyChanged" />
+            <Label Text="Read Only" VerticalOptions="Center" />
+        </HorizontalStackLayout>
+
+        <!-- Editor -->
+        <cm:CodeMirrorEditor x:Name="Editor"
+                             Grid.Row="1"
+                             Language="javascript"
+                             Theme="oneDark"
+                             BackgroundColor="#282c34" />
+
+        <!-- Status Bar -->
+        <HorizontalStackLayout Grid.Row="2" Spacing="20" Margin="0,10,0,0">
+            <Label x:Name="StatusLabel" Text="Ready" />
+            <Label x:Name="PositionLabel" Text="Line 1, Col 1" />
+            <Label x:Name="LengthLabel" Text="0 characters" />
+            
+            <Button Text="Load Sample" Clicked="OnLoadSampleClicked" />
+            <Button Text="Clear" Clicked="OnClearClicked" />
+            <Button Text="Get Value" Clicked="OnGetValueClicked" />
+            <Button Text="Format" Clicked="OnFormatClicked" />
+        </HorizontalStackLayout>
+        
+    </Grid>
+
+</ContentPage>

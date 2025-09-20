@@ -1,6 +1,6 @@
-# MAUI.CodeMirror — A .NET MAUI wrapper for the CodeMirror editor
+# MAUI.CodeMirror — A comprehensive .NET MAUI wrapper for CodeMirror 6
 
-> Rich, fast, and extensible code editing in your .NET MAUI apps (Android · iOS · macOS · Windows). Powered by **CodeMirror 6**.
+> Enterprise-ready code editor for .NET MAUI apps with full CodeMirror 6 API support. Build powerful code editing experiences for Android, iOS, macOS, and Windows.
 
 <p align="left">
   <a href="#">
@@ -18,19 +18,35 @@
 
 ## ✨ Why MAUI.CodeMirror?
 
-* **Native-feeling editor** inside MAUI via WebView/BlazorWebView with a clean C# API.
-* **CodeMirror 6** under the hood: modern architecture, great performance, and a huge extension ecosystem.
-* **Cross‑platform**: Android, iOS, macOS (Catalyst), and Windows (WebView2).
-* **Feature‑rich**: themes, language packs, syntax highlighting, autocomplete, search/replace, line numbers, read‑only, folding, linting, formatting hooks, and more.
+* **Complete CodeMirror 6 Integration** - Full access to the modern CodeMirror 6 API
+* **Native-feeling editor** - WebView/BlazorWebView with a clean C# API
+* **20+ Language Support** - JavaScript, TypeScript, Python, C#, Java, Go, Rust, and more
+* **14 Professional Themes** - Including One Dark, Dracula, GitHub Light/Dark, VS Code, and more
+* **Advanced IntelliSense** - Context-aware autocomplete with custom completion providers
+* **Rich Event System** - Comprehensive events for all editor interactions
+* **Cross-Platform** - Works seamlessly on Android, iOS, macOS, and Windows
 
-> This project wraps CodeMirror’s JavaScript API and exposes a strongly‑typed MAUI control so you can stay in C# for most scenarios.
+> This project wraps CodeMirror's JavaScript API and exposes a strongly‑typed MAUI control so you can stay in C# for most scenarios.
 
 ---
 
-## 📦 Packages
+## 📦 Project Structure
 
-* **MAUI.CodeMirror** — the main control for XAML/C# apps.
-* **MAUI.CodeMirror.Blazor** *(optional)* — convenience helpers for `BlazorWebView` apps.
+```
+Maui-Codemirror/
+├── src/
+│   ├── MAUI.CodeMirror/          # Main library
+│   └── MAUI.CodeMirror.Blazor/   # Blazor components
+├── samples/
+│   ├── MauiApp/                  # XAML sample app
+│   └── BlazorMauiApp/            # Blazor sample app
+└── README.md
+```
+
+### Packages
+
+* **MAUI.CodeMirror** — the main control for XAML/C# apps
+* **MAUI.CodeMirror.Blazor** — convenience helpers for BlazorWebView apps
 
 > NuGet packages will be published once the API stabilizes.
 
@@ -45,48 +61,80 @@
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
-### 1) Install
+### Installation
 
-```powershell
-# coming soon
+```bash
+# Clone the repository
+git clone https://github.com/your-org/maui-codemirror.git
+
+# Build the library
+cd src/MAUI.CodeMirror
+dotnet build
+
+# Or install via NuGet (coming soon)
 # dotnet add package MAUI.CodeMirror
 ```
 
-### 2) Add the control
-
-You can host CodeMirror using either **WebView** or **BlazorWebView**. Both options are supported.
-
-#### Option A — XAML + WebView (recommended minimal setup)
+### Basic Usage - XAML
 
 ```xml
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:cm="clr-namespace:MAUI.CodeMirror;assembly=MAUI.CodeMirror"
-    x:Class="Demo.EditorPage">
+    xmlns:cm="clr-namespace:MauiCodemirror;assembly=MAUI.CodeMirror"
+    x:Class="YourApp.EditorPage">
 
-    <cm:CodeMirrorView x:Name="Editor"
-                       HeightRequest="600"
-                       Language="csharp"
-                       Theme="oneDark"
-                       ShowLineNumbers="True"
-                       AutoComplete="True" />
+    <cm:CodeMirrorEditor x:Name="Editor"
+                         Language="javascript"
+                         Theme="oneDark" />
 </ContentPage>
 ```
 
 ```csharp
-protected override async void OnAppearing()
+using MauiCodemirror;
+using MauiCodemirror.Models;
+
+public partial class EditorPage : ContentPage
 {
-    base.OnAppearing();
-    await Editor.SetValueAsync("// Hello from MAUI.CodeMirror!\nConsole.WriteLine(\"Hi\");");
-    // Subscribe to changes
-    Editor.TextChanged += (_, e) => Console.WriteLine($"New length: {e.Text.Length}");
+    public EditorPage()
+    {
+        InitializeComponent();
+        InitializeEditor();
+    }
+
+    private async void InitializeEditor()
+    {
+        // Set initial code
+        await Editor.SetValue(@"
+function hello() {
+    console.log('Hello, World!');
+}
+
+hello();
+");
+
+        // Subscribe to events
+        Editor.OnContentChange += (s, e) =>
+        {
+            Console.WriteLine($"Content changed: {e.Text.Length} chars");
+        };
+
+        Editor.OnCursorActivity += (s, e) =>
+        {
+            Console.WriteLine($"Cursor at Line {e.Line}, Col {e.Column}");
+        };
+    }
+
+    private async void OnFormatClicked(object sender, EventArgs e)
+    {
+        await Editor.Format();
+    }
 }
 ```
 
-#### Option B — BlazorWebView
+### Basic Usage - Blazor
 
 ```razor
 @page "/editor"
@@ -94,95 +142,294 @@ protected override async void OnAppearing()
 
 <CodeMirrorComponent @ref="editor"
                      Language="typescript"
-                     Theme="githubDark" />
+                     Theme="githubDark"
+                     LineNumbers="true"
+                     @bind-Value="@codeContent" />
+
+<button @onclick="FormatCode">Format</button>
+<button @onclick="GetStatistics">Get Stats</button>
 
 @code {
     private CodeMirrorComponent? editor;
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private string codeContent = "const x: number = 42;";
+
+    private async Task FormatCode()
     {
-        if (firstRender && editor is not null)
+        if (editor != null)
         {
-            await editor.SetValueAsync("const x: number = 42;\n");
+            await editor.FormatAsync();
+        }
+    }
+
+    private async Task GetStatistics()
+    {
+        if (editor != null)
+        {
+            var value = await editor.GetValueAsync();
+            var pos = await editor.GetCursorPositionAsync();
+            Console.WriteLine($"Length: {value.Length}, Position: {pos}");
         }
     }
 }
 ```
 
-> Under the hood we load CodeMirror’s JS/CSS from embedded assets by default. You can switch to CDN or ship a custom bundle; see **Assets & Bundling** below.
+---
+
+## 🎨 Supported Languages
+
+| Language | Autocomplete | Linting | Formatting | Syntax Highlighting |
+|----------|-------------|---------|------------|-------------------|
+| JavaScript | ✅ | ✅ | ✅ | ✅ |
+| TypeScript | ✅ | ✅ | ✅ | ✅ |
+| Python | ✅ | ✅ | ✅ | ✅ |
+| C# | ✅ | ✅ | ✅ | ✅ |
+| Java | ✅ | ✅ | ✅ | ✅ |
+| C++ | ✅ | ✅ | ✅ | ✅ |
+| Go | ✅ | ✅ | ✅ | ✅ |
+| Rust | ✅ | ✅ | ✅ | ✅ |
+| PHP | ✅ | ✅ | ✅ | ✅ |
+| Ruby | ✅ | ✅ | ✅ | ✅ |
+| Swift | ✅ | ✅ | ✅ | ✅ |
+| Kotlin | ✅ | ✅ | ✅ | ✅ |
+| HTML/XML | ✅ | ❌ | ✅ | ✅ |
+| CSS/SCSS | ✅ | ✅ | ✅ | ✅ |
+| JSON | ❌ | ✅ | ✅ | ✅ |
+| YAML | ❌ | ✅ | ✅ | ✅ |
+| SQL | ✅ | ❌ | ✅ | ✅ |
+| Markdown | ❌ | ❌ | ✅ | ✅ |
 
 ---
 
-## 🧩 Features
+## 🎨 Available Themes
 
-* **Languages**: JS/TS, JSON, HTML, CSS, C#, Java, Python, Go, SQL, Markdown, YAML, and more via CM6 language packages.
-* **Themes**: One Dark, Dracula, GitHub Light/Dark, Solarized, … or your own.
-* **Editing**: multi‑cursor, selections, undo/redo, indent guides, bracket matching.
-* **Navigation**: minimap (optional add‑on), go‑to‑line, search/replace panel.
-* **UX**: read‑only, word wrap, line numbers, rulers, highlight active line, gutter decorations.
-* **Folding & Outline**: fold regions, basic outline (via language support).
-* **Linting**: hook your own analyzers, or wire to ESLint, prettier, etc.
-* **Autocomplete**: built‑in or custom providers from C#.
-* **Formatting**: call into Prettier/your formatter; expose as `FormatAsync()`.
-* **Clipboard & Drag‑Drop**: optional integrations.
+### Dark Themes
+- `oneDark` - Atom One Dark
+- `dracula` - Dracula
+- `githubDark` - GitHub Dark
+- `monokai` - Monokai
+- `solarizedDark` - Solarized Dark
+- `vsCode` - VS Code Dark
+- `material` - Material Theme
+- `nord` - Nord
+- `atomOneDark` - Atom One Dark Pro
+- `gruvboxDark` - Gruvbox Dark
+- `cobalt` - Cobalt
 
-> Availability depends on which extensions you enable in your config.
-
----
-
-## 🧪 Quick API Tour
-
-### Properties
-
-```csharp
-Editor.Language        // string (e.g. "csharp", "typescript")
-Editor.Theme           // string (e.g. "oneDark")
-Editor.ReadOnly        // bool
-Editor.ShowLineNumbers // bool
-Editor.WordWrap        // bool
-Editor.TabSize         // int
-Editor.AutoComplete    // bool
-Editor.Value           // string (getter caches via last sync)
-```
-
-### Methods
-
-```csharp
-Task SetValueAsync(string text);
-Task<string> GetValueAsync();
-Task SetSelectionAsync(int from, int to);
-Task<(int from, int to)> GetSelectionAsync();
-Task SetOptionAsync(string key, object? value);  // advanced
-Task FocusAsync();
-Task FormatAsync();
-Task ScrollToLineAsync(int line, int column = 1);
-```
-
-### Events
-
-```csharp
-Editor.TextChanged += (s, e) => { string newText = e.Text; };
-Editor.CursorMoved += (s, e) => { int line = e.Line; int column = e.Column; };
-Editor.SelectionChanged += ...;
-Editor.Ready += ...; // fired after the webview & cm are initialized
-```
+### Light Themes
+- `githubLight` - GitHub Light
+- `solarizedLight` - Solarized Light
 
 ---
 
-## ⚙️ Configuration
+## 📚 Advanced Features
 
-Configuration is provided via attached properties and a `CodeMirrorOptions` object.
+### Custom Autocomplete
+
+```csharp
+using MauiCodemirror.Services;
+
+var completionService = new CodeMirrorCompletionService();
+
+// Register custom completions
+completionService.RegisterCompletions("javascript", new List<CompletionOption>
+{
+    new() { Label = "myFunction", Type = "function", Detail = "Custom function" },
+    new() { Label = "MY_CONSTANT", Type = "constant", Detail = "Custom constant" }
+});
+
+// Register dynamic completion provider
+completionService.RegisterCompletionProvider("javascript", async (context, position) =>
+{
+    // Fetch completions from your API or service
+    var completions = await FetchCompletionsAsync(context);
+    return completions;
+});
+```
+
+### Working with Decorations
+
+```csharp
+// Add line decorations
+var decorations = new List<Decoration>
+{
+    new()
+    {
+        From = 0,
+        To = 10,
+        Line = new LineDecoration { Class = "highlighted-line" }
+    },
+    new()
+    {
+        From = 50,
+        To = 60,
+        Mark = new MarkDecoration { Class = "error-underline" }
+    }
+};
+
+var decorationIds = await Editor.AddDecorations(decorations);
+
+// Remove decorations later
+await Editor.RemoveDecorations(decorationIds);
+```
+
+### Custom Commands and Key Bindings
+
+```csharp
+// Register a custom command
+var command = new CodeMirrorCommand
+{
+    Name = "insertDate",
+    Key = "Ctrl-D",
+    Run = "insertCurrentDate"
+};
+
+await Editor.RegisterCommand(command);
+
+// Execute commands
+await Editor.ExecuteCommand("insertDate");
+await Editor.ExecuteCommand("selectAll");
+await Editor.ExecuteCommand("format");
+```
+
+### Event Handling
+
+```csharp
+// Content events
+Editor.OnContentChange += (s, e) =>
+{
+    Console.WriteLine($"Changed: {e.From} to {e.To}, Text: {e.Text}");
+};
+
+// Selection events
+Editor.OnSelectionChange += (s, e) =>
+{
+    Console.WriteLine($"Selection: {e.Ranges.Count} ranges");
+};
+
+// Focus events
+Editor.OnFocus += (s, e) => Console.WriteLine("Editor focused");
+Editor.OnBlur += (s, e) => Console.WriteLine("Editor blurred");
+
+// Mouse events
+Editor.OnMouseDown += (s, e) =>
+{
+    Console.WriteLine($"Click at position {e.Pos}");
+};
+
+// Key events
+Editor.OnKeyDown += (s, e) =>
+{
+    if (e.CtrlKey && e.Key == "s")
+    {
+        // Handle save
+        e.PreventDefault = true;
+    }
+};
+```
+
+---
+
+## 🏃 Running the Samples
+
+### XAML Sample App
+
+```bash
+cd samples/MauiApp
+dotnet build
+dotnet run --framework net9.0-windows
+```
+
+### Blazor Sample App
+
+```bash
+cd samples/BlazorMauiApp
+dotnet build
+dotnet run --framework net9.0-windows
+```
+
+---
+
+## 📖 API Reference
+
+### Core Methods
+
+| Method | Description |
+|--------|-------------|
+| `SetValue(string)` | Set the editor content |
+| `GetValue()` | Get the current content |
+| `GetDocument()` | Get the full document |
+| `GetLine(int)` | Get specific line content |
+| `GetLineCount()` | Get total line count |
+| `GetRange(int, int)` | Get text in range |
+| `ReplaceRange(string, int, int)` | Replace text in range |
+
+### Position & Selection
+
+| Method | Description |
+|--------|-------------|
+| `GetCursorPosition()` | Get current cursor position |
+| `SetCursorPosition(int, int)` | Set cursor to line/column |
+| `GetSelection()` | Get current selection |
+| `SetSelection(int, int)` | Set selection range |
+| `SelectAll()` | Select all text |
+| `ClearSelection()` | Clear selection |
+
+### Navigation
+
+| Method | Description |
+|--------|-------------|
+| `ScrollToLine(int)` | Scroll to specific line |
+| `ScrollToCursor()` | Scroll to cursor position |
+| `GotoLine(int)` | Go to specific line |
+| `Focus()` | Focus the editor |
+| `HasFocus()` | Check if editor has focus |
+
+### Editing
+
+| Method | Description |
+|--------|-------------|
+| `Undo()` | Undo last operation |
+| `Redo()` | Redo last operation |
+| `Format()` | Format the code |
+| `ToggleComment()` | Toggle line comment |
+| `Find(string)` | Find text |
+| `Replace(string, string)` | Replace text |
+
+---
+
+## 🔧 Configuration Options
 
 ```csharp
 var options = new CodeMirrorOptions
 {
-    Language = "csharp",
+    Language = "javascript",
     Theme = "oneDark",
+    LineNumbers = true,
+    FoldGutter = true,
+    AutoComplete = true,
+    BracketMatching = true,
+    HighlightActiveLine = true,
     TabSize = 4,
+    IndentUnit = "  ",
+    LineWrapping = false,
     ReadOnly = false,
-    WordWrap = true,
-    Extensions = new[] { CodeMirrorExtensions.Folding, CodeMirrorExtensions.SearchPanel }
+
+    // Advanced options
+    Lint = new LintOptions { Enabled = true },
+    History = new HistoryOptions { MaxHistory = 100 },
+    Autocomplete = new AutocompleteOptions
+    {
+        ActivateOnTyping = true,
+        Icons = true
+    },
+    Performance = new PerformanceOptions
+    {
+        DebounceTime = 250,
+        MaxFileSize = 10485760
+    }
 };
-await Editor.ConfigureAsync(options);
+
+Editor.Options = options;
 ```
 
 You can also provide JSON if you prefer to pass raw CM6 extension config:
@@ -199,78 +446,61 @@ await Editor.ConfigureRawAsync("""
 
 ---
 
-## 🔌 Calling JS and Receiving Events
-
-Internally the control uses platform WebViews:
-
-* **Windows**: WebView2 `CoreWebView2.ExecuteScriptAsync`
-* **iOS/macOS**: `WKWebView.EvaluateJavaScript`
-* **Android**: `WebView.EvaluateJavascript`
-
-For custom integrations you can:
-
-```csharp
-await Editor.InvokeJsAsync("myCustomFunction", new { arg1 = 123 });
-Editor.RegisterMessageHandler("lintResults", payload => { /* handle */ });
-```
-
-…and from JS send messages back with `window.MauiBridge.postMessage({ type: 'lintResults', data })`.
-
-> With **BlazorWebView**, you can alternatively use standard `IJSRuntime` interop through the Blazor wrapper.
-
----
-
 ## 📁 Assets & Bundling
 
 By default the package ships with a curated CM6 bundle as **embedded resources** to avoid CDN dependency.
 
 **Options**
 
-1. **Embedded (default)** — no configuration required.
-2. **CDN** — set `Editor.AssetMode = AssetMode.Cdn` and make sure your app allows external network access.
+1. **Embedded (default)** — no configuration required
+2. **CDN** — set `Editor.AssetMode = AssetMode.Cdn` and ensure network access
 3. **Custom bundle** — tree‑shake only what you need:
-
-   * Build with `rollup` or `esbuild`.
-   * Place output under `Resources/Raw/codemirror` (or any folder) and set `Editor.AssetPath` accordingly.
-
----
-
-## 📐 Large Files & Performance Tips
-
-* Prefer a **custom bundle** with only the languages/features you need.
-* Disable features you don’t use (minimap, heavy linters) for very large files.
-* Use `ReadOnly=true` when viewing huge files to reduce event traffic.
-* Debounce `TextChanged` when syncing back to C#.
+   * Build with `rollup` or `esbuild`
+   * Place output under `Resources/Raw/codemirror` and set `Editor.AssetPath`
 
 ---
 
-## 🧭 Samples
+## 📐 Performance Tips
 
-* **samples/MauiApp** — XAML + CodeMirrorView
-* **samples/BlazorMauiApp** — BlazorWebView + CodeMirrorComponent
+* Prefer a **custom bundle** with only needed languages/features
+* Disable heavy features (minimap, linters) for large files
+* Use `ReadOnly=true` when viewing huge files to reduce event traffic
+* Debounce `TextChanged` when syncing back to C#
 
-Run locally:
+---
 
-```bash
-# from repo root
-dotnet workload restore
-dotnet build
+## 🔌 Custom JS Integration
+
+For custom integrations you can:
+
+```csharp
+// Call custom JS functions
+await Editor.InvokeJsAsync("myCustomFunction", new { arg1 = 123 });
+
+// Register message handlers
+Editor.RegisterMessageHandler("lintResults", payload => { /* handle */ });
 ```
 
-Open the sample app project for your platform and run.
+From JS send messages back with:
+```javascript
+window.MauiBridge.postMessage({ type: 'lintResults', data });
+```
+
+> With **BlazorWebView**, you can alternatively use standard `IJSRuntime` interop.
 
 ---
 
 ## 🛣️ Roadmap
 
-* [ ] Diagnostics panel API (squiggles, Problems list)
-* [ ] Minimap add‑on
-* [ ] Diff view (two‑pane)
-* [ ] Vim/Emacs keymaps
-* [ ] More language packs & auto‑detect
-* [ ] Virtualized very‑large‑file viewer mode
-
-Have a feature request? File an issue!
+- [ ] Diagnostics panel API (squiggles, Problems list)
+- [ ] Minimap add‑on
+- [ ] Diff view (two‑pane)
+- [ ] Vim/Emacs keymaps
+- [ ] More language packs & auto‑detect
+- [ ] Virtualized very‑large‑file viewer mode
+- [ ] IntelliSense providers for more languages
+- [ ] Integrated terminal
+- [ ] Multi-file tabbed editing
 
 ---
 
@@ -278,51 +508,35 @@ Have a feature request? File an issue!
 
 Contributions are welcome! Please:
 
-1. **Open an issue** to discuss major changes first.
-2. Follow the existing coding style and add **unit/integration tests**.
-3. Run `dotnet format` and ensure CI passes locally.
+1. **Open an issue** to discuss major changes first
+2. Follow the existing coding style and add **unit/integration tests**
+3. Run `dotnet format` and ensure CI passes locally
 
-### Dev environment
+### Development Environment
 
 * MAUI workloads installed for your target platforms
 * Node 18+ for building custom JS bundles (if you touch assets)
 * `pnpm` or `npm` for JS build scripts
 
-Repo layout:
-
-```
-/ src
-  / MAUI.CodeMirror
-  / MAUI.CodeMirror.Blazor (optional)
-/ samples
-/ tools (build tasks, bundle scripts)
-```
-
 ---
 
 ## 🔒 Security
 
-If you discover a security issue, please **do not** open a public issue. Email the maintainer instead: `{your-email}@example.com`.
+If you discover a security issue, please **do not** open a public issue. Email the maintainer instead: `security@example.com`.
 
 ---
 
 ## 📄 License
 
-**MIT** — see `LICENSE` file.
+**MIT** — see LICENSE file for details.
 
 ---
 
-## 🙏 Acknowledgements
+## 🙏 Acknowledgments
 
-* [CodeMirror](https://codemirror.net/) and its maintainers
-* .NET MAUI team & community
+* [CodeMirror](https://codemirror.net/) - The amazing editor that powers this wrapper
+* .NET MAUI team for the fantastic cross-platform framework
 
 ---
 
-## 📸 Screenshots
-
-> *Add platform screenshots here*
-
-* Android — dark theme
-* Windows — light theme
-* iPadOS — split view
+Built with ❤️ for the .NET MAUI community

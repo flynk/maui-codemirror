@@ -1,0 +1,230 @@
+@using Microsoft.JSInterop
+@using MAUI.CodeMirror
+@using MauiCodemirror.Models
+@implements IAsyncDisposable
+
+<div @ref="editorContainer" class="codemirror-container" style="@Style"></div>
+
+@code {
+    [Inject] IJSRuntime JS { get; set; } = default!;
+    
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public string Language { get; set; } = "javascript";
+    [Parameter] public string Theme { get; set; } = "oneDark";
+    [Parameter] public bool LineNumbers { get; set; } = true;
+    [Parameter] public bool ReadOnly { get; set; } = false;
+    [Parameter] public bool AutoComplete { get; set; } = true;
+    [Parameter] public bool FoldGutter { get; set; } = true;
+    [Parameter] public bool HighlightActiveLine { get; set; } = true;
+    [Parameter] public bool BracketMatching { get; set; } = true;
+    [Parameter] public bool CloseBrackets { get; set; } = true;
+    [Parameter] public string? Style { get; set; } = "width: 100%; height: 400px;";
+    [Parameter] public string? ClassName { get; set; }
+    [Parameter] public CodeMirrorOptions? Options { get; set; }
+    
+    [Parameter] public EventCallback<SelectionChangeEventArgs> OnSelectionChange { get; set; }
+    [Parameter] public EventCallback<CursorActivityEventArgs> OnCursorActivity { get; set; }
+    [Parameter] public EventCallback<CodeMirrorFocusEventArgs> OnFocus { get; set; }
+    [Parameter] public EventCallback<CodeMirrorFocusEventArgs> OnBlur { get; set; }
+    
+    private ElementReference editorContainer;
+    private IJSObjectReference? moduleRef;
+    private IJSObjectReference? editorRef;
+    private DotNetObjectReference<CodeMirrorComponent>? dotNetRef;
+    private bool isInitialized = false;
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InitializeEditor();
+        }
+    }
+    
+    private async Task InitializeEditor()
+    {
+        try
+        {
+            // Create .NET reference for callbacks
+            dotNetRef = DotNetObjectReference.Create(this);
+            
+            // Load CodeMirror module
+            moduleRef = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/MAUI.CodeMirror.Blazor/codemirror.js");
+            
+            // Initialize editor
+            var options = Options ?? new CodeMirrorOptions
+            {
+                Value = Value ?? "",
+                Language = Language,
+                Theme = Theme,
+                LineNumbers = LineNumbers,
+                ReadOnly = ReadOnly,
+                Autocompletion = AutoComplete,
+                FoldGutter = FoldGutter,
+                HighlightActiveLine = HighlightActiveLine,
+                BracketMatching = BracketMatching,
+                CloseBrackets = CloseBrackets
+            };
+            
+            editorRef = await moduleRef.InvokeAsync<IJSObjectReference>(
+                "createEditor", editorContainer, options, dotNetRef);
+            
+            isInitialized = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to initialize CodeMirror: {ex.Message}");
+        }
+    }
+    
+    public async Task<string> GetValueAsync()
+    {
+        if (editorRef != null)
+        {
+            return await editorRef.InvokeAsync<string>("getValue");
+        }
+        return Value ?? "";
+    }
+    
+    public async Task SetValueAsync(string value)
+    {
+        if (editorRef != null)
+        {
+            await editorRef.InvokeVoidAsync("setValue", value);
+            Value = value;
+            await ValueChanged.InvokeAsync(value);
+        }
+    }
+    
+    public async Task SetLanguageAsync(string language)
+    {
+        if (editorRef != null)
+        {
+            await editorRef.InvokeVoidAsync("setLanguage", language);
+            Language = language;
+        }
+    }
+    
+    public async Task SetThemeAsync(string theme)
+    {
+        if (editorRef != null)
+        {
+            await editorRef.InvokeVoidAsync("setTheme", theme);
+            Theme = theme;
+        }
+    }
+    
+    public async Task SetReadOnlyAsync(bool readOnly)
+    {
+        if (editorRef != null)
+        {
+            await editorRef.InvokeVoidAsync("setReadOnly", readOnly);
+            ReadOnly = readOnly;
+        }
+    }
+    
+    public async Task FocusAsync()
+    {
+        if (editorRef != null)
+        {
+            await editorRef.InvokeVoidAsync("focus");
+        }
+    }
+    
+    public async Task<(int line, int column)> GetCursorPositionAsync()
+    {
+        if (editorRef != null)
+        {
+            var pos = await editorRef.InvokeAsync<CursorPosition>("getCursorPosition");
+            return (pos.Line, pos.Column);
+        }
+        return (0, 0);
+    }
+    
+    public async Task SetCursorPositionAsync(int line, int column)
+    {
+        if (editorRef != null)
+        {
+            await editorRef.InvokeVoidAsync("setCursorPosition", line, column);
+        }
+    }
+    
+    public async Task UndoAsync()
+    {
+        if (editorRef != null)
+        {
+            await editorRef.InvokeVoidAsync("undo");
+        }
+    }
+    
+    public async Task RedoAsync()
+    {
+        if (editorRef != null)
+        {
+            await editorRef.InvokeVoidAsync("redo");
+        }
+    }
+    
+    public async Task FormatAsync()
+    {
+        if (editorRef != null)
+        {
+            await editorRef.InvokeVoidAsync("format");
+        }
+    }
+    
+    [JSInvokable]
+    public async Task OnEditorValueChanged(string value)
+    {
+        Value = value;
+        await ValueChanged.InvokeAsync(value);
+    }
+    
+    [JSInvokable]
+    public async Task OnEditorSelectionChanged(SelectionChangeEventArgs args)
+    {
+        await OnSelectionChange.InvokeAsync(args);
+    }
+    
+    [JSInvokable]
+    public async Task OnEditorCursorActivity(CursorActivityEventArgs args)
+    {
+        await OnCursorActivity.InvokeAsync(args);
+    }
+    
+    [JSInvokable]
+    public async Task OnEditorFocus()
+    {
+        await OnFocus.InvokeAsync(new CodeMirrorFocusEventArgs { HasFocus = true });
+    }
+    
+    [JSInvokable]
+    public async Task OnEditorBlur()
+    {
+        await OnBlur.InvokeAsync(new CodeMirrorFocusEventArgs { HasFocus = false });
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        if (editorRef != null)
+        {
+            await editorRef.InvokeVoidAsync("dispose");
+            await editorRef.DisposeAsync();
+        }
+        
+        if (moduleRef != null)
+        {
+            await moduleRef.DisposeAsync();
+        }
+        
+        dotNetRef?.Dispose();
+    }
+    
+    private class CursorPosition
+    {
+        public int Line { get; set; }
+        public int Column { get; set; }
+    }
+}

@@ -63,14 +63,14 @@ namespace MauiCodemirror
 
         public event EventHandler<string> CodeChanged;
 
-        private WebView _webView;
-        private ActivityIndicator _loadingIndicator;
-        private Label _loadingLabel;
-        private Grid _loadingOverlay;
-        private string _cachedCode;
-        private string _cachedLanguage;
-        private string _cachedTheme;
-        private bool _isInitialized = false;
+        protected WebView _webView;
+        protected ActivityIndicator _loadingIndicator;
+        protected Label _loadingLabel;
+        protected Grid _loadingOverlay;
+        protected string _cachedCode;
+        protected string _cachedLanguage;
+        protected string _cachedTheme;
+        protected bool _isInitialized = false;
 
         public CodeMirrorEditorView()
         {
@@ -191,7 +191,7 @@ namespace MauiCodemirror
             }
         }
 
-        private async Task InitializeEditor()
+        protected virtual async Task InitializeEditor()
         {
             // Use idempotent setters for initial configuration
             var theme = GetCodeMirrorTheme(Theme);
